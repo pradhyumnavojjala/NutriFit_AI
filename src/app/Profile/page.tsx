@@ -1,343 +1,315 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { useState } from "react";
-
-// Import all necessary icons for the new custom fields
-import { AppleIcon, CalendarIcon, DumbbellIcon, Settings, User, Rss, Ruler, Weight, Hand, Info, Code, Mail } from "lucide-react"; 
+import { useState, useEffect, useMemo } from "react";
+import { PieChart, Pie, Cell } from "recharts"; // Pie chart
+import { Dumbbell, Utensils, Edit } from "lucide-react"; // Icons
+import { ClipLoader } from "react-spinners"; // Loading spinner
 import ProfileHeader from "@/Components/ProfileHeader";
 import CornerElements from "@/Components/CornerElements";
-import { Button } from "@/Components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
 import NoFitnessPlan from "@/Components/NoFitnessPlan";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/Components/ui/accordion";
 
+// Types
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: number;
+  progress: number;
+}
+
+interface Meal {
+  meal: string;
+  foods: string[];
+}
+
+interface Day {
+  day: string;
+  exercises: Exercise[];
+  diet: Meal[];
+}
+
+interface FitnessPlan {
+  name: string;
+  days: Day[];
+}
+
+interface UserDetails {
+  dob: string;
+  email: string;
+  height: string;
+  weight: string;
+  nickname: string;
+  exerciseLevel: string;
+}
+
+// Custom hook: fetch or generate fitness plan
+const useFitnessPlan = () => {
+  const [currentPlan, setCurrentPlan] = useState<FitnessPlan | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const plans: FitnessPlan[] = [
+        {
+          name: "Full Body Beginner",
+          days: [
+            {
+              day: "Day 1",
+              exercises: [
+                { name: "Pushups", sets: 3, reps: 12, progress: 0 },
+                { name: "Squats", sets: 3, reps: 15, progress: 0 },
+                { name: "Plank", sets: 3, reps: 60, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Oatmeal", "Banana"] },
+                { meal: "Lunch", foods: ["Grilled Chicken", "Rice", "Broccoli"] },
+                { meal: "Dinner", foods: ["Salad", "Salmon"] },
+              ],
+            },
+            {
+              day: "Day 2",
+              exercises: [
+                { name: "Lunges", sets: 3, reps: 12, progress: 0 },
+                { name: "Pullups", sets: 3, reps: 8, progress: 0 },
+                { name: "Burpees", sets: 3, reps: 10, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Smoothie", "Toast"] },
+                { meal: "Lunch", foods: ["Quinoa", "Veggies"] },
+                { meal: "Dinner", foods: ["Soup", "Salad"] },
+              ],
+            },
+            {
+              day: "Day 3",
+              exercises: [
+                { name: "Dumbbell Rows", sets: 3, reps: 12, progress: 0 },
+                { name: "Deadlifts", sets: 3, reps: 10, progress: 0 },
+                { name: "Mountain Climbers", sets: 3, reps: 20, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Eggs", "Avocado Toast"] },
+                { meal: "Lunch", foods: ["Chicken Salad"] },
+                { meal: "Dinner", foods: ["Grilled Fish", "Veggies"] },
+              ],
+            },
+            {
+              day: "Day 4",
+              exercises: [
+                { name: "Shoulder Press", sets: 3, reps: 12, progress: 0 },
+                { name: "Bicep Curls", sets: 3, reps: 12, progress: 0 },
+                { name: "Tricep Dips", sets: 3, reps: 10, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Yogurt", "Granola"] },
+                { meal: "Lunch", foods: ["Turkey Sandwich", "Salad"] },
+                { meal: "Dinner", foods: ["Steamed Veggies", "Chicken"] },
+              ],
+            },
+            {
+              day: "Day 5",
+              exercises: [
+                { name: "Leg Press", sets: 3, reps: 15, progress: 0 },
+                { name: "Calf Raises", sets: 3, reps: 20, progress: 0 },
+                { name: "Jump Squats", sets: 3, reps: 12, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Pancakes", "Fruits"] },
+                { meal: "Lunch", foods: ["Salmon", "Brown Rice"] },
+                { meal: "Dinner", foods: ["Vegetable Soup", "Bread"] },
+              ],
+            },
+            {
+              day: "Day 6",
+              exercises: [
+                { name: "Crunches", sets: 3, reps: 20, progress: 0 },
+                { name: "Leg Raises", sets: 3, reps: 15, progress: 0 },
+                { name: "Russian Twists", sets: 3, reps: 20, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Smoothie Bowl"] },
+                { meal: "Lunch", foods: ["Chicken Wrap"] },
+                { meal: "Dinner", foods: ["Grilled Veggies", "Tofu"] },
+              ],
+            },
+            {
+              day: "Day 7",
+              exercises: [
+                { name: "Yoga / Stretching", sets: 1, reps: 30, progress: 0 },
+                { name: "Walking / Cardio", sets: 1, reps: 30, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Fruit Salad"] },
+                { meal: "Lunch", foods: ["Vegetable Stir Fry"] },
+                { meal: "Dinner", foods: ["Light Soup"] },
+              ],
+            },
+          ],
+        },
+        {
+          name: "Strength Builder",
+          days: [
+            {
+              day: "Day 1",
+              exercises: [
+                { name: "Bench Press", sets: 4, reps: 10, progress: 0 },
+                { name: "Incline Dumbbell Press", sets: 3, reps: 12, progress: 0 },
+              ],
+              diet: [
+                { meal: "Breakfast", foods: ["Oats", "Protein Shake"] },
+                { meal: "Lunch", foods: ["Grilled Chicken", "Sweet Potato"] },
+                { meal: "Dinner", foods: ["Salad", "Steak"] },
+              ],
+            },
+            // Repeat same structure for Days 2–7 with different exercises/meals...
+          ],
+        },
+        // Add 8 more plans similarly with 7 days each
+      ];
+
+      const randomIndex = Math.floor(Math.random() * plans.length);
+      setCurrentPlan(plans[randomIndex]);
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return { currentPlan, isLoading };
+};
 
 const ProfilePage = () => {
   const { user } = useUser();
- 
-  const userId = user?.id as string;
+  const { currentPlan, isLoading } = useFitnessPlan();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableDetails, setEditableDetails] = useState<UserDetails>({
+    dob: "2006-12-30",
+    email: user?.emailAddresses?.[0]?.emailAddress || "N/A",
+    height: "170 cm",
+    weight: "60 kg",
+    nickname: user?.firstName || "User",
+    exerciseLevel: "Beginner",
+  });
 
-  // Function to safely format DOB
-  const formatDOB = (dob: string | undefined): string => {
-    if (!dob) return 'N/A';
-    // DOB is stored as YYYY-MM-DD string, so we display it as a local date string
-    try {
-      return new Date(dob).toLocaleDateString();
-    } catch {
-      return dob;
-    }
-  };
+  const age = useMemo(() => {
+    const birthDate = new Date(editableDetails.dob);
+    const ageDifMs = Date.now() - birthDate.getTime();
+    const ageDate = new Date(ageDifMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  }, [editableDetails.dob]);
 
-  const allPlans = useQuery(api.plans.getUserPlans, { userId });
-  const [selectedPlanId, setSelectedPlanId] = useState<null | string>(null);
+  const overallProgress = useMemo(() => {
+    if (!currentPlan) return 0;
+    const totalExercises = currentPlan.days.flatMap(day => day.exercises).length;
+    const totalProgress = currentPlan.days.flatMap(day => day.exercises).reduce((sum, ex) => sum + ex.progress, 0);
+    return totalExercises > 0 ? Math.round(totalProgress / totalExercises) : 0;
+  }, [currentPlan]);
 
-  const activePlan = allPlans?.find((plan) => plan.isActive);
+  const pieData = [
+    { name: "Completed", value: overallProgress, color: "#3b82f6" },
+    { name: "Remaining", value: 100 - overallProgress, color: "#e5e7eb" },
+  ];
 
-  const currentPlan = selectedPlanId
-    ? allPlans?.find((plan) => plan._id === selectedPlanId)
-    : activePlan;
-
-  // 🛑 NEW: Safely extract custom metadata 🛑
-  const metadata = user?.unsafeMetadata || {};
-  const dob = metadata.dateOfBirth as string || 'N/A';
-  const codeName = metadata.codeName as string || 'N/A';
-  const age = metadata.age as string || 'N/A';
-  const height = metadata.height as string || 'N/A';
-  const weight = metadata.weight as string || 'N/A';
-  const disability = metadata.disability as string || 'N/A';
-  const description = metadata.description as string || 'No description provided.';
-
+  const handleSaveDetails = () => setIsEditing(false);
 
   return (
     <section className="relative z-10 pt-12 pb-32 flex-grow container mx-auto px-4">
       <ProfileHeader user={user} />
 
-      {/* --- UPDATED USER STATS OVERVIEW WITH EDIT OPTION --- */}
-      <div className="relative backdrop-blur-sm border border-border rounded-lg p-6 mb-8 mt-4">
+      {/* User Details */}
+      <div className="relative backdrop-blur-sm border border-border rounded-lg p-6 mt-6 transition-all duration-300 hover:shadow-lg">
         <CornerElements />
-        <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-border/50 pb-4">
-                <div className="space-y-1">
-                    <h3 className="text-xl font-bold tracking-tight">
-                        Welcome, <span className="text-primary">{user?.firstName || user?.username || 'User'}</span>!
-                    </h3>
-                    <p className="text-sm text-muted-foreground font-mono">
-                        System ID: <span className="text-xs text-primary/70">{user?.id}</span>
-                    </p>
-                </div>
-                
-                {/* 🛑 THE EDIT OPTION (Manage Account) 🛑 */}
-                <Button 
-                    asChild 
-                    variant="default" 
-                    className="mt-4 md:mt-0"
-                >
-                    {/* Link to custom user profile path */}
-                    <a href="/user" className="flex items-center gap-2"> 
-                        <Settings className="size-4" />
-                        Manage Account
-                    </a>
-                </Button>
-                {/* 🛑 END EDIT OPTION 🛑 */}
-
-            </div>
-            
-            <h4 className="text-lg font-bold tracking-tight border-b border-border/50 pb-2 flex items-center gap-2">
-                <User className="size-5 text-primary"/> Personal & Physical Stats
-            </h4>
-
-            {/* --- DETAILED INFO GRID (2 columns) --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm font-mono">
-                
-                {/* Row 1: Names */}
-                <div className="flex items-center gap-2">
-                    <User className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Name:</span>
-                    <span className="text-foreground font-bold">
-                        {user?.firstName || 'N/A'} {user?.lastName || ''}
-                    </span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <Code className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Code Name:</span>
-                    <span className="text-primary font-bold">{codeName}</span>
-                </div>
-                
-                {/* Row 2: Contact/DOB */}
-                <div className="flex items-center gap-2">
-                    <Mail className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Email:</span>
-                    <span className="text-primary break-all">{user?.emailAddresses?.[0]?.emailAddress || 'N/A'}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <CalendarIcon className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">DOB:</span>
-                    <span className="text-foreground">{formatDOB(dob)}</span>
-                </div>
-                
-                {/* Row 3: Physical Stats */}
-                <div className="flex items-center gap-2">
-                    <Rss className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Age:</span>
-                    <span className="text-foreground">{age}</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <Ruler className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Height:</span>
-                    <span className="text-foreground">{height} cm</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <Weight className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Weight:</span>
-                    <span className="text-foreground">{weight} kg</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Hand className="size-4 text-primary/70"/>
-                    <span className="text-muted-foreground">Disability:</span>
-                    <span className="text-foreground">{disability}</span>
-                </div>
-                
-                {/* Row 4: Description (full width) */}
-                <div className="md:col-span-2 pt-2 border-t border-border/50">
-                    <div className="flex items-start gap-2">
-                        <Info className="size-4 text-primary/70 mt-1"/>
-                        <span className="text-muted-foreground">About Me:</span>
-                    </div>
-                    <p className="text-foreground mt-1 ml-6 text-sm whitespace-pre-wrap">{description}</p>
-                </div>
-
-            </div>
-            {/* --- END DETAILED INFO GRID --- */}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold">User Details</h3>
+          <button onClick={() => setIsEditing(!isEditing)} className="text-blue-500 hover:text-blue-700 transition-colors">
+            <Edit size={20} />
+          </button>
         </div>
-      </div>
-      {/* --- END UPDATED USER STATS OVERVIEW --- */}
-
-      {allPlans && allPlans?.length > 0 ? (
-        <div className="space-y-8">
-          {/* PLAN SELECTOR (unchanged) */}
-          <div className="relative backdrop-blur-sm border border-border p-6">
-            <CornerElements />
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold tracking-tight">
-                <span className="text-primary">Your</span>{" "}
-                <span className="text-foreground">Fitness Plans</span>
-              </h2>
-              <div className="font-mono text-xs text-muted-foreground">
-                TOTAL: {allPlans.length}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {allPlans.map((plan) => (
-                <Button
-                  key={plan._id}
-                  onClick={() => setSelectedPlanId(plan._id)}
-                  className={`text-foreground border hover:text-white ${
-                    selectedPlanId === plan._id
-                      ? "bg-primary/20 text-primary border-primary"
-                      : "bg-transparent border-border hover:border-primary/50"
-                  }`}
-                >
-                  {plan.name}
-                  {plan.isActive && (
-                    <span className="ml-2 bg-green-500/20 text-green-500 text-xs px-2 py-0.5 rounded">
-                      ACTIVE
-                    </span>
-                  )}
-                </Button>
-              ))}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div><strong>Full Name:</strong> {user ? `${user.firstName} ${user.lastName || ""}`.trim() : "Guest"}</div>
+          <div>
+            <strong>Nickname:</strong>{" "}
+            {isEditing ? <input value={editableDetails.nickname} onChange={e => setEditableDetails({ ...editableDetails, nickname: e.target.value })} className="border rounded px-2 py-1 w-full"/> : editableDetails.nickname}
           </div>
-
-          {/* PLAN DETAILS (unchanged) */}
-
-          {currentPlan && (
-            <div className="relative backdrop-blur-sm border border-border rounded-lg p-6">
-              <CornerElements />
-
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                <h3 className="text-lg font-bold">
-                  PLAN: <span className="text-primary">{currentPlan.name}</span>
-                </h3>
-              </div>
-
-              <Tabs defaultValue="workout" className="w-full">
-                <TabsList className="mb-6 w-full grid grid-cols-2 bg-cyber-terminal-bg border">
-                  <TabsTrigger
-                    value="workout"
-                    className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
-                  >
-                    <DumbbellIcon className="mr-2 size-4" />
-                    Workout Plan
-                  </TabsTrigger>
-
-                  <TabsTrigger
-                    value="diet"
-                    className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
-                  >
-                    <AppleIcon className="mr-2 h-4 w-4" />
-                    Diet Plan
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="workout">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <CalendarIcon className="h-4 w-4 text-primary" />
-                      <span className="font-mono text-sm text-muted-foreground">
-                        SCHEDULE: {currentPlan.workoutPlan.schedule.join(", ")}
-                      </span>
-                    </div>
-
-                    <Accordion type="multiple" className="space-y-4">
-                      {currentPlan.workoutPlan.exercises.map((exerciseDay, index) => (
-                        <AccordionItem
-                          key={index}
-                          value={exerciseDay.day}
-                          className="border rounded-lg overflow-hidden"
-                        >
-                          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/10 font-mono">
-                            <div className="flex justify-between w-full items-center">
-                              <span className="text-primary">{exerciseDay.day}</span>
-                              <div className="text-xs text-muted-foreground">
-                                {exerciseDay.routines.length} EXERCISES
-                              </div>
-                            </div>
-                          </AccordionTrigger>
-
-                          <AccordionContent className="pb-4 px-4">
-                            <div className="space-y-3 mt-2">
-                              {currentPlan.workoutPlan.exercises[index]?.routines.map((routine, routineIndex) => (
-                                <div
-                                  key={routineIndex}
-                                  className="border border-border rounded p-3 bg-background/50"
-                                >
-                                  <div className="flex justify-between items-start mb-2">
-                                    <h4 className="font-semibold text-foreground">
-                                      {routine.name}
-                                    </h4>
-                                    <div className="flex items-center gap-2">
-                                      <div className="px-2 py-1 rounded bg-primary/20 text-primary text-xs font-mono">
-                                        {routine.sets} SETS
-                                      </div>
-                                      <div className="px-2 py-1 rounded bg-secondary/20 text-secondary text-xs font-mono">
-                                        {routine.reps} REPS
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {routine.description && (
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                      {routine.description}
-                                    </p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="diet">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="font-mono text-sm text-muted-foreground">
-                        DAILY CALORIE TARGET
-                      </span>
-                      <div className="font-mono text-xl text-primary">
-                        {currentPlan.dietPlan.dailyCalories} KCAL
-                      </div>
-                    </div>
-
-                    <div className="h-px w-full bg-border my-4"></div>
-
-                    <div className="space-y-4">
-                      {currentPlan.dietPlan.meals.map((meal, index) => (
-                        <div
-                          key={index}
-                          className="border border-border rounded-lg overflow-hidden p-4"
-                        >
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className="w-2 h-2 rounded-full bg-primary"></div>
-                            <h4 className="font-mono text-primary">{meal.name}</h4>
-                          </div>
-                          <ul className="space-y-2">
-                            {meal.foods.map((food, foodIndex) => (
-                              <li
-                                key={foodIndex}
-                                className="flex items-center gap-2 text-sm text-muted-foreground"
-                              >
-                                <span className="text-xs text-primary font-mono">
-                                  {String(foodIndex + 1).padStart(2, "0")}
-                                </span>
-                                {food}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
+          <div><strong>Email:</strong> {editableDetails.email}</div>
+          <div>
+            <strong>Date of Birth:</strong>{" "}
+            {isEditing ? <input type="date" value={editableDetails.dob} onChange={e => setEditableDetails({ ...editableDetails, dob: e.target.value })} className="border rounded px-2 py-1 w-full"/> : editableDetails.dob}
+          </div>
+          <div><strong>Age:</strong> {age}</div>
+          <div>
+            <strong>Height:</strong>{" "}
+            {isEditing ? <input value={editableDetails.height} onChange={e => setEditableDetails({ ...editableDetails, height: e.target.value })} className="border rounded px-2 py-1 w-full"/> : editableDetails.height}
+          </div>
+          <div>
+            <strong>Weight:</strong>{" "}
+            {isEditing ? <input value={editableDetails.weight} onChange={e => setEditableDetails({ ...editableDetails, weight: e.target.value })} className="border rounded px-2 py-1 w-full"/> : editableDetails.weight}
+          </div>
+          <div>
+            <strong>Exercise Level:</strong>{" "}
+            {isEditing ? (
+              <select value={editableDetails.exerciseLevel} onChange={e => setEditableDetails({ ...editableDetails, exerciseLevel: e.target.value })} className="border rounded px-2 py-1 w-full">
+                <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+              </select>
+            ) : editableDetails.exerciseLevel}
+          </div>
         </div>
-      ) : (
-        <NoFitnessPlan />
-      )}
+        {isEditing && <button onClick={handleSaveDetails} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">Save Changes</button>}
+      </div>
+
+      {/* Fitness Plan */}
+      {isLoading ? (
+        <div className="flex justify-center mt-8"><ClipLoader size={50} color="#3b82f6" /></div>
+      ) : currentPlan ? (
+        <div className="relative backdrop-blur-sm border border-border rounded-lg p-6 mt-8 transition-all duration-300 hover:shadow-lg">
+          <CornerElements />
+          <h3 className="text-lg font-bold mb-4">{currentPlan.name}</h3>
+          <div className="flex justify-center mb-6">
+            <PieChart width={128} height={208}>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value">
+                {pieData.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+              </Pie>
+            </PieChart>
+            <div className="absolute text-sm font-semibold">{overallProgress}%</div>
+          </div>
+          <Accordion type="single" collapsible className="space-y-2">
+            {currentPlan.days.map((day, i) => (
+              <AccordionItem key={i} value={`day-${i}`}>
+                <AccordionTrigger className="flex items-center gap-2"><Dumbbell size={16} /> {day.day}</AccordionTrigger>
+                <AccordionContent>
+                  <Accordion type="single" collapsible className="space-y-2 mt-2">
+                    {day.exercises.map((ex, ei) => (
+                      <AccordionItem key={ei} value={`ex-${ei}`}>
+                        <AccordionTrigger>{ex.name} - {ex.sets}x{ex.reps}</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="mb-2">
+                            <div className="flex justify-between text-sm mb-1"><span>Progress</span><span>{ex.progress}%</span></div>
+                            <div className="w-full h-2 bg-gray-200 rounded-full">
+                              <div className="h-2 bg-blue-500 rounded-full transition-all duration-300" style={{ width: `${ex.progress}%` }} />
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                  <Accordion type="single" collapsible className="space-y-2 mt-3">
+                    {day.diet.map((d, di) => (
+                      <AccordionItem key={di} value={`diet-${di}`}>
+                        <AccordionTrigger className="flex items-center gap-2"><Utensils size={16} /> {d.meal}</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="text-sm">{d.foods.join(", ")}</div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      ) : <NoFitnessPlan />}
     </section>
   );
 };
+
 export default ProfilePage;
