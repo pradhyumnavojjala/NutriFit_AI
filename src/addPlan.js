@@ -1,33 +1,66 @@
-// addPlan.js
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "./firebase-config";
+"use client";
+import { auth, db } from "@/firebase-config";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { useState } from "react";
 
-export const addPlan = async () => {
-  try {
-    const docRef = await addDoc(collection(db, "plans"), {
-      name: "My First Plan",
-      userId: "test-user-id",
-      isActive: true,
-      createdAt: new Date(),
-      dietPlan: {
-        dailyCalories: 2000,
-        meals: [
-          { name: "Breakfast", foods: ["Eggs", "Oatmeal"] },
-        ],
-      },
+export default function GeneratePlanPage() {
+  const [loading, setLoading] = useState(false);
+
+  const handleGeneratePlan = async () => {
+    setLoading(true);
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You need to be logged in!");
+      setLoading(false);
+      return;
+    }
+
+    const newPlan = {
+      userId: user.uid,
+      name: "My Custom Fitness Plan",
       workoutPlan: {
-        schedule: ["Mon", "Wed", "Fri"],
+        schedule: ["Monday", "Wednesday", "Friday"],
         exercises: [
           {
-            day: "Mon",
-            routines: [{ name: "Pushups", sets: 3, reps: 12 }],
+            day: "Monday",
+            routines: [
+              { name: "Push-ups", sets: 3, reps: 15 },
+              { name: "Squats", sets: 3, reps: 20 },
+            ],
           },
         ],
       },
-    });
+      dietPlan: {
+        dailyCalories: 2200,
+        meals: [
+          { name: "Breakfast", foods: ["Oats", "Banana", "Milk"] },
+          { name: "Lunch", foods: ["Rice", "Chicken", "Vegetables"] },
+        ],
+      },
+      isActive: true,
+      createdAt: serverTimestamp(),
+    };
 
-    console.log("Plan added with ID:", docRef.id);
-  } catch (e) {
-    console.error("Error adding plan:", e);
-  }
-};
+    try {
+      await addDoc(collection(db, "plans"), newPlan);
+      alert("Plan saved successfully!");
+    } catch (error) {
+      console.error("Error saving plan:", error);
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen text-center">
+      <button
+        onClick={handleGeneratePlan}
+        className="bg-primary text-white px-6 py-3 rounded hover:bg-primary/90"
+        disabled={loading}
+      >
+        {loading ? "Saving..." : "Generate & Save Plan"}
+      </button>
+    </div>
+  );
+}

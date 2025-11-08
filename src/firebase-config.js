@@ -1,9 +1,9 @@
-// Import the functions you need from the SDKs you need
+// src/firebase-config.js
 import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// Your web app's Firebase configuration
+// 🔥 Your Firebase project config
 const firebaseConfig = {
   apiKey: "AIzaSyAdDfA0VHBy4KY4qfdfajAkJVRg1IInVWo",
   authDomain: "nutrifit-8bd81.firebaseapp.com",
@@ -13,5 +13,9 @@ const firebaseConfig = {
   appId: "1:510485323671:web:2a564c1e5e49c88ec36ed2"
 };
 
-// Initialize Firebase
+// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
+
+// ✅ Initialize services
+export const auth = getAuth(app);
+export const db = getFirestore(app);
