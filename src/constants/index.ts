@@ -40,7 +40,7 @@ export const USER_PROGRAMS = [
   {
     id: 2,
     first_name: "Chandra",
-    profilePic: "2b.jpeg",
+    profilePic: "/2b.jpeg",
     fitness_goal: "Muscle Gain",
     height: "5'10\"",
     weight: "170 lbs",

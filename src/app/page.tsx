@@ -1,3 +1,5 @@
+// ./src/app/page.tsx
+
 "use client";
 import TerminalOverlay from "@/Components/TerminalOverlay";
 import { Button } from "@/Components/ui/button";
@@ -7,7 +9,7 @@ import Link from "next/link";
 import AuthPage from "@/AuthPage";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/firebase-config"; // 👈 Make sure you export `auth` from firebase-config
+import { auth } from "@/firebase-config"; 
 import Image from "next/image";
 
 const HomePage = () => {
@@ -136,12 +138,16 @@ const HomePage = () => {
               {/* Image Container */}
               <div className="relative aspect-square max-w-lg mx-auto">
                 <div className="relative overflow-hidden rounded-lg bg-cyber-black shadow-2xl">
+                
                   <Image
                     src="/AI.png"
-                    alt="AI Fitness Coach Illustration"
-                    className="size-full object-cover object-center"
-                    loading="lazy"
+                    alt="AI Assistant Logo"
+                    // FIX: Added required width/height (40px)
+                    width={40000} 
+                    height={40000} 
+                    style={{ objectFit: 'contain' }}
                   />
+                
 
                   {/* Scan Line Animation */}
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(50%-1px),var(--cyber-glow-primary)_50%,transparent_calc(50%+1px),transparent_100%)] bg-[length:100%_8px] animate-scanline pointer-events-none opacity-70" />

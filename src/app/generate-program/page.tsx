@@ -293,7 +293,7 @@ const GenerateProgramPage = () => {
                 <div className={`absolute inset-0 bg-primary/20 rounded-full blur-xl transition-opacity ${isTextMode ? "opacity-0" : isSpeaking ? "opacity-100 animate-pulse" : "opacity-0"}`} />
                 {/* Image FIX: Replaced <img> with <Image /> */}
                 <Image 
-                    src="/1.jpg" 
+                    src="/1p.jpg" 
                     alt="AI Assistant" 
                     fill 
                     style={{ objectFit: 'cover' }}

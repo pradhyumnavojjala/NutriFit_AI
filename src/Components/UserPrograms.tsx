@@ -1,6 +1,6 @@
+// ./src/Components/UserPrograms.tsx
+
 import Link from "next/link";
-
-
 import {
   ChevronRight,
   Dumbbell,
@@ -92,6 +92,9 @@ const UserPrograms = () => {
                       src={program.profilePic}
                       alt={`${program.first_name}`}
                       className="h-full w-full object-cover"
+                      // FIX: Added required width/height (h-16 w-16 is 64px x 64px)
+                      width={64} 
+                      height={64}
                     />
                   </div>
                   <div>
