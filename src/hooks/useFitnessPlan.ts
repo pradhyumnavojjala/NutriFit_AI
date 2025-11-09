@@ -33,7 +33,7 @@ export interface FitnessPlan {
   name: string;
   days: Day[];
   // Include other top-level fields found in your Firestore document here
-  [key: string]: any; // Allows for flexible DocumentData fields like Firestore IDs if needed
+  [key: string]: unknown; // Allows for flexible DocumentData fields like Firestore IDs if needed
 }
 
 // Define the explicit return type for the hook

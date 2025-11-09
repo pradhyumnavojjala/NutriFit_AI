@@ -4,14 +4,15 @@ import * as React from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { cn } from "@/lib/utils";
 
-// 1. Define the props interface by extending the Radix Switch Root Props.
-// This ensures all standard props like 'checked', 'onCheckedChange', etc., are correctly typed.
-export interface SwitchProps
-  extends React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root> {
-  // Add any custom props here if you had them
-}
+// 1. FIX: Changed the interface to a type alias (using 'type' instead of 'interface')
+//    and included the className property for explicit clarity.
+export type SwitchProps = React.ComponentPropsWithoutRef<
+  typeof SwitchPrimitive.Root
+> & {
+  className?: string; // Add className explicitly since we destructure it
+};
 
-// 2. Use the new interface in the component definition.
+// 2. Use the new type alias in the component definition.
 export const Switch = ({ className, ...props }: SwitchProps) => (
   <SwitchPrimitive.Root
     className={cn(
