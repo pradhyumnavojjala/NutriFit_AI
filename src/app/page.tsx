@@ -6,7 +6,7 @@ import { Button } from "@/Components/ui/button";
 import UserPrograms from "@/Components/UserPrograms";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import AuthPage from "@/AuthPage";
+
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/firebase-config"; 
@@ -32,11 +32,6 @@ const HomePage = () => {
         Checking authentication...
       </div>
     );
-  }
-
-  // 🧠 If no user is logged in → show AuthPage
-  if (!user) {
-    return <AuthPage />;
   }
 
   // ✅ If user is logged in → show main homepage
