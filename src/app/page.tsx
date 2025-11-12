@@ -13,7 +13,7 @@ import { auth } from "@/firebase-config";
 import Image from "next/image";
 
 const HomePage = () => {
-  const [_user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
